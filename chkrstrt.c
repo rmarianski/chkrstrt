@@ -8,7 +8,6 @@
 #include <sys/stat.h>
 #include <stdbool.h>
 #include <ram-def.h>
-#include <ram-err.h>
 
 int main() {
     size_t maps_size_inc = 4096;
@@ -30,7 +29,7 @@ int main() {
                 continue;
             }
             char maps_fname[32];
-            perr_die_if(snprintf(maps_fname, sizeof(maps_fname), "/proc/%d/maps", pid) >= sizeof(maps_fname), "snprintf");
+            assert(snprintf(maps_fname, sizeof(maps_fname), "/proc/%d/maps", pid) < sizeof(maps_fname));
             FILE *mapsf = fopen(maps_fname, "r");
             if (!mapsf) {
                 if (errno == EACCES) {
@@ -72,7 +71,7 @@ int main() {
             maps_buffer[maps_buf_read] = 0;
             if (strstr(maps_buffer, ".so (deleted)")) {
                 char comm_fname[32];
-                perr_die_if(snprintf(comm_fname, sizeof(comm_fname), "/proc/%d/comm", pid) >= sizeof(comm_fname), "snprintf");
+                assert(snprintf(comm_fname, sizeof(comm_fname), "/proc/%d/comm", pid) < sizeof(comm_fname));
                 FILE *commf = fopen(comm_fname, "r");
                 if (!commf) {
                     perror("fopen");
